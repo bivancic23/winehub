@@ -7,7 +7,7 @@ WineHub je web aplikacija razvijena u Ruby on Rails okviru koja omogućuje uprav
 ## Tehnologije
 
 - Ruby (3.x)
-- Ruby on Rails (7.x)
+- Ruby on Rails (7/8)
 - PostgreSQL
 - Tailwind CSS
 - Prawn (PDF generiranje)
@@ -62,11 +62,51 @@ Zatim pokrenuti:
 
 ### 4. Pokretanje aplikacije
 
-    rails server
+Preporučeni način:
+
+    bin/dev
 
 Aplikacija će biti dostupna na:
 
     http://localhost:3000
+
+Ako je port zauzet:
+
+    PORT=3001 bin/dev
+
+---
+
+## Demo podaci i korisnici
+
+Nakon pokretanja:
+
+    rails db:seed
+
+u sustav se učitavaju testni podaci (proizvodi, partneri, narudžbe).
+
+### Admin korisnici
+
+    Email: admin@example.com
+    Lozinka: password123
+
+    Email: a@a.a
+    Lozinka: 123456
+
+### Partner korisnici
+
+    Email: borna.ivancic23@gmail.com
+    Lozinka: password123
+
+Dodatno se generira više partner korisnika:
+
+    partner2@winehub.test
+    partner3@winehub.test
+    ...
+    partner50@winehub.test
+
+Za sve njih vrijedi:
+
+    Lozinka: password123
 
 ---
 
@@ -96,11 +136,24 @@ Za pokretanje testova:
 
 ---
 
+## E-mail funkcionalnost
+
+Za slanje e-mailova potrebno je postaviti varijable okruženja:
+
+    GMAIL_USERNAME=vas_email@gmail.com
+    GMAIL_APP_PASSWORD=vas_app_password
+
+Ako varijable nisu postavljene:
+- aplikacija će raditi normalno
+- e-mailovi se neće stvarno slati (test mode)
+
+---
+
 ## Napomene
 
 - Sustav koristi PostgreSQL bazu podataka
 - PDF dokumenti generiraju se pomoću Prawn biblioteke
-- E-mail funkcionalnost može zahtijevati dodatnu konfiguraciju (SMTP)
+- Aplikacija koristi Tailwind CSS (pokreće se kroz `bin/dev`)
 
 ---
 
@@ -109,9 +162,14 @@ Za pokretanje testova:
 ### PostgreSQL nije pokrenut
 Pokrenuti PostgreSQL servis (ovisno o OS-u)
 
-### Greška kod instalacije gemova
+### Port 3000 zauzet
 
-    bundle update
+    lsof -i :3000
+    kill -9 PID
+
+ili pokrenuti na drugom portu:
+
+    PORT=3001 bin/dev
 
 ### Problem s bazom
 
