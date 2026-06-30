@@ -52,7 +52,8 @@
           <div class="flex items-center gap-2">
             <%= check_box_tag :use_custom_delivery_address, "1", false,
                               class: "rounded border-gray-300",
-                              id: "use_custom_delivery_address" %>
+                              id: "use_custom_delivery_address",
+                              onchange: "document.getElementById('custom_delivery_address_box').classList.toggle('hidden', !this.checked)" %>
             <%= label_tag :use_custom_delivery_address, "Dostava na drugu adresu", class: "text-sm font-medium text-gray-700" %>
           </div>
 
@@ -82,20 +83,7 @@
         <% end %>
       </div>
 
-      <script>
-          document.addEventListener("DOMContentLoaded", function () {
-              const checkbox = document.getElementById("use_custom_delivery_address");
-              const box = document.getElementById("custom_delivery_address_box");
-              if (!checkbox || !box) return;
 
-              function toggleBox() {
-                  box.classList.toggle("hidden", !checkbox.checked);
-              }
-
-              checkbox.addEventListener("change", toggleBox);
-              toggleBox();
-          });
-      </script>
     <% end %>
 
     <!-- ACTIONS -->
@@ -106,6 +94,22 @@
                       method: :post,
                       data: { turbo_confirm: "Sigurno poslati narudžbu?" },
                       class: btn_primary %>
+      <% end %>
+
+      <%= button_to "Generiraj ponudu",
+                    generate_offer_order_path(@order),
+                    method: :post,
+                    class: btn_primary %>
+
+      <%= button_to "Pošalji ponudu e-poštom",
+                    send_offer_order_path(@order),
+                    method: :post,
+                    class: btn_primary %>
+
+      <% if @order.offer&.pdf&.attached? %>
+        <%= link_to "Preuzmi PDF",
+                    rails_blob_path(@order.offer.pdf, disposition: "attachment"),
+                    class: btn_secondary %>
       <% end %>
 
       <%= link_to "Nazad na narudžbe", orders_path, class: btn_secondary %>

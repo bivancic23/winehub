@@ -207,6 +207,69 @@ class OrdersController < ApplicationController
     redirect_to order_path(@order), notice: 'Adresa dostave je spremljena.'
   end
 
+  def generate_offer
+    @order = current_user.company.orders.find(params[:id])
+
+    offer = @order.offer || @order.create_offer!(
+      number: "OFF-#{Time.current.strftime('%Y%m%d')}-#{SecureRandom.hex(2).upcase}"
+    )
+
+    Orders::RecalculateTotals.new(order: @order).call
+    Offers::GeneratePdf.new(offer: offer).call
+
+    redirect_to order_path(@order), notice: "Ponuda je generirana."
+  end
+
+  def generate_offer
+    @order = current_user.company.orders.find(params[:id])
+
+    offer = @order.offer || @order.create_offer!(
+      number: "OFF-#{Time.zone.now.strftime('%Y%m%d')}-#{SecureRandom.hex(2).upcase}"
+    )
+
+    if @order.due_date.nil?
+      @order.update!(
+        due_date: Date.current + @order.company.payment_terms_days.days
+      )
+    end
+
+    ::Offers::GeneratePdf.new(offer: offer).call
+
+    redirect_to order_path(@order), notice: 'Ponuda je generirana.'
+  end
+
+  def send_offer
+    @order = current_user.company.orders.find(params[:id])
+
+    offer = @order.offer || @order.create_offer!(
+      number: "OFF-#{Time.zone.now.strftime('%Y%m%d')}-#{SecureRandom.hex(2).upcase}"
+    )
+
+    ::Orders::RecalculateTotals.new(order: @order).call
+
+    if @order.due_date.blank?
+      days = @order.company.payment_terms_days.to_i
+      @order.update!(due_date: Date.current + days.days) if days.positive?
+    end
+
+    sent_to = @order.company.offers_email
+
+    if sent_to.blank?
+      redirect_to order_path(@order), alert: 'Firma nema unesenu e-mail adresu za ponude.'
+      return
+    end
+
+    offer.update!(sent_to_email: sent_to)
+
+    ::Offers::GeneratePdf.new(offer: offer).call
+
+    OfferMailer.send_offer(offer).deliver_later
+
+    offer.update!(sent_at: Time.zone.now)
+
+    redirect_to order_path(@order), notice: "Ponuda poslana na #{sent_to}."
+  end
+
   private
 
   def ensure_partner!

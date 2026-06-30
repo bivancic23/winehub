@@ -14,6 +14,7 @@ Rails.application.routes.draw do
       post :mark_paid, on: :member
       post :send_offer, on: :member
     end
+
     resources :companies, only: %i[index new create edit update]
     resources :reports, only: [:index] do
       collection do
@@ -38,6 +39,8 @@ Rails.application.routes.draw do
 
     post :submit, on: :member
     patch :update_delivery_address, on: :member
+    post :generate_offer, on: :member
+    post :send_offer, on: :member
   end
 
   get 'up' => 'rails/health#show', as: :rails_health_check

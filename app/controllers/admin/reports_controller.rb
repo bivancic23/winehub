@@ -17,6 +17,12 @@ module Admin
       @to = range.last.to_date
       @orders_count = orders.count
       @revenue_cents = orders.sum(:total_cents)
+      @sales_chart = orders
+                       .group("DATE(created_at)")
+                       .order("DATE(created_at)")
+                       .sum(:total_cents)
+                       .transform_keys { |date| date.to_date.strftime("%d.%m.%Y") }
+                       .transform_values { |cents| cents.to_i / 100.0 }
 
       respond_to do |format|
         format.html
@@ -50,6 +56,7 @@ module Admin
       @from = range.first.to_date
       @to = range.last.to_date
       @rows = items
+      @products_chart = items.limit(10).map { |r| [r.name, r.revenue_cents.to_i / 100.0] }.to_h
 
       respond_to do |format|
         format.html
@@ -77,6 +84,7 @@ module Admin
       @from = range.first.to_date
       @to = range.last.to_date
       @rows = rows
+      @partners_chart = rows.limit(10).map { |r| [r.name, r.revenue_cents.to_i / 100.0] }.to_h
 
       respond_to do |format|
         format.html
@@ -101,6 +109,7 @@ module Admin
       @from = range.first.to_date
       @to = range.last.to_date
       @rows = rows # { "draft"=>3, "approved"=>5 ... }
+      @statuses_chart = rows
 
       respond_to do |format|
         format.html
