@@ -22,6 +22,21 @@
                           class: "w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" %>
       </div>
 
+      <!-- Company -->
+      <div>
+        <%= f.label :company_id, "Tvrtka", class: "block text-sm font-semibold mb-1" %>
+        <%= f.collection_select :company_id,
+                                Company.order(:name),
+                                :id,
+                                :name,
+                                { prompt: "Odaberi tvrtku" },
+                                { required: true,
+                                  class: "w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" } %>
+        <p class="text-xs text-gray-500 mt-1">
+          Ne vidiš svoju tvrtku na popisu? Javi se administratoru da je doda u sustav.
+        </p>
+      </div>
+
       <!-- Password -->
       <div>
         <%= f.label :password, "Lozinka", class: "block text-sm font-semibold mb-1" %>

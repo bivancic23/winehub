@@ -6,6 +6,8 @@ class ApplicationController < ActionController::Base
 
   include Pundit::Authorization
 
+  before_action :configure_permitted_parameters, if: :devise_controller?
+
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
   rescue_from ActiveRecord::RecordNotFound do
     redirect_to root_path, alert: 'Traženi zapis ne postoji ili nemate pristup.'
@@ -19,6 +21,12 @@ class ApplicationController < ActionController::Base
     else
       root_path
     end
+  end
+
+  protected
+
+  def configure_permitted_parameters
+    devise_parameter_sanitizer.permit(:sign_up, keys: [:company_id])
   end
 
   private

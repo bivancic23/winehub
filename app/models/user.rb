@@ -8,5 +8,5 @@ class User < ApplicationRecord
 
   enum :role, { partner_user: 0, admin: 1 }
 
-  validates :company, presence: true, if: :partner_user?
+  validates :company, presence: { message: 'mora biti odabrana' }, if: :partner_user?
 end
