@@ -130,10 +130,19 @@
         <tr>
           <th class="text-left px-4 py-3">Proizvod</th>
           <th class="text-left px-4 py-3">Količina</th>
-          <th class="text-left px-4 py-3">VPC</th>
+          <th class="text-left px-4 py-3">
+            VPC
+            <span class="block normal-case text-[10px] font-normal text-gray-400">bez PDV-a</span>
+          </th>
           <th class="text-left px-4 py-3">PDV</th>
-          <th class="text-left px-4 py-3">MPC</th>
-          <th class="text-left px-4 py-3">Iznos</th>
+          <th class="text-left px-4 py-3">
+            MPC
+            <span class="block normal-case text-[10px] font-normal text-gray-400">s PDV-om</span>
+          </th>
+          <th class="text-left px-4 py-3">
+            Iznos
+            <span class="block normal-case text-[10px] font-normal text-gray-400">s PDV-om</span>
+          </th>
         </tr>
         </thead>
 
@@ -161,6 +170,11 @@
         <% end %>
         </tbody>
       </table>
+
+      <p class="px-4 py-3 text-xs text-gray-500 border-t bg-gray-50">
+        Napomena: rabat naveden u iznad ne utječe na cijene po stavci (VPC/MPC/Iznos) — primjenjuje se
+        zbirno, na razini cijele narudžbe (vidi sažetak).
+      </p>
     </div>
 
     <!-- TOTALS CARD -->
@@ -169,9 +183,31 @@
 
       <div class="space-y-2 text-sm">
         <div class="flex justify-between">
-          <span class="text-gray-600">Subtotal</span>
+          <span class="text-gray-600">
+            Subtotal
+            <span class="block text-[11px] text-gray-400">bez PDV-a, bez rabata</span>
+          </span>
           <span class="font-medium"><%= number_to_currency(@order.subtotal_cents / 100.0, unit: "€") %></span>
         </div>
+
+        <% if @order.discount_cents.to_i.positive? %>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Rabat</span>
+            <span class="font-medium text-green-700">
+              -<%= number_to_currency(@order.discount_cents / 100.0, unit: "€") %>
+            </span>
+          </div>
+
+          <div class="flex justify-between">
+            <span class="text-gray-600">
+              Osnovica
+              <span class="block text-[11px] text-gray-400">bez PDV-a, nakon rabata</span>
+            </span>
+            <span class="font-medium">
+              <%= number_to_currency((@order.subtotal_cents.to_i - @order.discount_cents.to_i) / 100.0, unit: "€") %>
+            </span>
+          </div>
+        <% end %>
 
         <div class="flex justify-between">
           <span class="text-gray-600">PDV (25%)</span>
@@ -179,7 +215,10 @@
         </div>
 
         <div class="border-t pt-3 mt-3 flex justify-between text-base font-bold">
-          <span>Ukupno</span>
+          <span>
+            Ukupno
+            <span class="block text-[11px] font-normal text-gray-400">s PDV-om</span>
+          </span>
           <span><%= number_to_currency(@order.grand_total_cents / 100.0, unit: "€") %></span>
         </div>
 
